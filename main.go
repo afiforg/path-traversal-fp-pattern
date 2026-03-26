@@ -1,0 +1,39 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func main() {
+	inputPath := flag.String("path", "", "user-provided path")
+	flag.Parse()
+
+	result, err := resolveResourcePath(*inputPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("resolved path: %s\n", result)
+}
+
+// resolveResourcePath demonstrates the false-positive pattern:
+// - If user input is non-empty, return immediately.
+// - os.ReadFile only executes when inputPath == "".
+func resolveResourcePath(inputPath string) (string, error) {
+	if inputPath != "" {
+		return inputPath, nil
+	}
+
+	// This sink is reachable only when inputPath is empty.
+	content, err := os.ReadFile(filepath.Join("fixtures", "default_path.txt"))
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(content)), nil
+}
