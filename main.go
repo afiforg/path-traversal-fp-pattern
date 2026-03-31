@@ -4,8 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
 func main() {
@@ -24,16 +22,10 @@ func main() {
 // resolveResourcePath demonstrates the false-positive pattern:
 // - If user input is non-empty, return immediately.
 // - os.ReadFile only executes when inputPath == "".
+// - inputPath still flows into the sink argument construction.
 func resolveResourcePath(inputPath string) (string, error) {
 	if inputPath != "" {
 		return inputPath, nil
 	}
-
-	// This sink is reachable only when inputPath is empty.
-	content, err := os.ReadFile(filepath.Join("fixtures", "default_path.txt"))
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(content)), nil
+	return pickBaseReference(inputPath)
 }
