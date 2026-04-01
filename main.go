@@ -24,8 +24,9 @@ func main() {
 // - os.ReadFile only executes when inputPath == "".
 // - inputPath still flows into the sink argument construction.
 func resolveResourcePath(inputPath string) (string, error) {
-	if inputPath != "" {
-		return inputPath, nil
+	if inputPath == "" {
+		return pickBaseReference(inputPath)
 	}
-	return pickBaseReference(inputPath)
+
+	return inputPath, nil
 }
